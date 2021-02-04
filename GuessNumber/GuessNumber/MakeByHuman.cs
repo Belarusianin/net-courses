@@ -25,8 +25,9 @@ namespace GuessNumber
         }
 
         static int counter = 0;
-
-        public int MachineTry(int begin ,int end, int tryNumber = 0, char direction = '0')
+        int tryNumber;
+        char direction;
+        public int MachineTry(int begin ,int end)
         {
             tryNumber = (end + begin) / 2;
             if(tryNumber == number)
@@ -47,16 +48,16 @@ namespace GuessNumber
 
             if (direction == '1' || direction == 'y')
             {
-                return MachineTry((begin + end) / 2, end, tryNumber, direction);
+                return MachineTry((begin + end) / 2, end);
             }
             else if(direction == '0' || direction == 'n')
             {
-                return MachineTry(begin, (begin + end) / 2, tryNumber, direction);
+                return MachineTry(begin, (begin + end) / 2);
             }
 
             Console.WriteLine("You put invalid value. Try once again");
             counter--;
-            return MachineTry(begin, end, tryNumber, direction);
+            return MachineTry(begin, end);
         }
     }
 }

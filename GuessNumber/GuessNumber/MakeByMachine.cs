@@ -29,8 +29,7 @@ namespace GuessNumber
                 if (int.TryParse(Console.ReadLine(), out tryNumber))
                 {
                     counter++;
-                    //tryNumber = int.Parse(Console.ReadLine());
-
+                    
                     if(tryNumber == number)
                     {
                         Console.WriteLine("You guess , congratulations");
