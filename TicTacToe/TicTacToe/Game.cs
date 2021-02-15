@@ -4,109 +4,118 @@ using System.Text;
 
 namespace TicTacToe
 {
+    public enum State
+    {
+        Cross,
+        Zero,
+        Unset
+    }
+
+    public enum Winner
+    {
+        Crosses,
+        Zeros,
+        Draw,
+        Unfinished
+    }
+
+
     class Game
     {
-        public static char[] chests = new char[9];
+        readonly State[] chests = new State[9];
+        int counter = 0;
 
         public Game()
         {
             for (int i = 0; i < 9; i++)
             {
-                chests[i] = '_';
+                chests[i] = State.Unset;
             }
-            Console.WriteLine("Put numbers form 1 to 9");
         }
 
-        public static void Print()
+        public void MakeMove(int index)
         {
-            for (int i = 0; i < 9; i++)
-            {
-                if (i % 3 == 0)
-                    Console.WriteLine();
-                Console.Write(chests[i] + "\t");
-            }
-            Console.WriteLine();
+            chests[index - 1] = counter % 2 == 0 ? State.Cross : State.Zero;
+
+            counter++;
         }
 
-        bool Combination()
+        public State GetState(int index)
         {
-            if ((chests[0] == chests[4] && chests[0] == chests[8] && chests[0] != '_') || (chests[2] == chests[4] && chests[2] == chests[6] && chests[2] != '_'))
-            {
-                return true;
-            }
-            else if ((chests[0] == chests[1] && chests[0] == chests[2] && chests[0] != '_') || (chests[3] == chests[4] && chests[3] == chests[5] && chests[3] != '_') || (chests[6] == chests[7] && chests[6] == chests[8] && chests[6] != '_'))
-            {
-                return true;
-            }
-            else if ((chests[0] == chests[3] && chests[0] == chests[6] && chests[0] != '_') || (chests[1] == chests[4] && chests[1] == chests[7] && chests[1] != '_') || (chests[2] == chests[5] && chests[2] == chests[8] && chests[2] != '_'))
-            {
-                return true;
-            }
-
-            return false;
+            return chests[index - 1];
         }
 
-        bool CheckNumber(int number)
+        //public Winner GetWinner()
+        //{
+        //    if ((chests[0] == chests[4] && chests[0] == chests[8] && chests[0] != State.Unset) || (chests[2] == chests[4] && chests[2] == chests[6] && chests[2] != State.Unset))
+        //    {
+        //        if (chests[0] == State.Cross || chests[2] == State.Cross)
+        //        {
+        //            return Winner.Crosses;
+        //        }
+        //        else
+        //        {
+        //            return Winner.Zeros;
+        //        }
+        //    }
+        //    else if ((chests[0] == chests[1] && chests[0] == chests[2] && chests[0] != State.Unset) || (chests[3] == chests[4] && chests[3] == chests[5] && chests[3] != State.Unset) || (chests[6] == chests[7] && chests[6] == chests[8] && chests[6] != State.Unset))
+        //    {
+        //        if (chests[0] == State.Cross || chests[3] == State.Cross || chests[6] == State.Cross)
+        //        {
+        //            return Winner.Crosses;
+        //        }
+        //        else
+        //        {
+        //            return Winner.Zeros;
+        //        }
+        //    }
+        //    else if ((chests[0] == chests[3] && chests[0] == chests[6] && chests[0] != State.Unset) || (chests[1] == chests[4] && chests[1] == chests[7] && chests[1] != State.Unset) || (chests[2] == chests[5] && chests[2] == chests[8] && chests[2] != State.Unset))
+        //    {
+        //        if ((chests[0] == State.Cross || chests[1] == State.Cross || chests[2] == State.Cross))
+        //        {
+        //            return Winner.Crosses;
+        //        }
+        //        else
+        //        {
+        //            return Winner.Zeros;
+        //        }
+        //    }
+
+        //    if (counter < 9)
+        //    {
+        //        return Winner.Unfinished;
+        //    }
+
+        //    return Winner.Draw;
+        //}
+
+
+        public Winner GetWinner()
         {
-            for (int i = 0; i < 9; i++)
+            return GetWinner(/*vertical triplets*/1, 4, 7, 2, 5, 8, 3, 6, 9,
+                /*horizontal triplets*/1, 2, 3, 4, 5, 6, 7, 8, 9,
+                /*diaganals triplets*/2, 5, 9, 3, 5, 7);
+        }
+
+        Winner GetWinner(params int[] indexes)
+        {
+            for (int i = 0; i < indexes.Length; i+=3)
             {
-                if ((number >= 10 || number < 0) || (chests[number] == 'x' || chests[number] == 'o'))
+                if (AreSame(indexes[i], indexes[i+1], indexes[i+2]) && GetState(indexes[i]) != State.Unset)
                 {
-                    Console.WriteLine("You put wrong number,please try again");
-                    return false;
+                    return GetState(i) == State.Cross ? Winner.Crosses : Winner.Zeros;
                 }
             }
-            return true;
+            if (counter<9)
+            {
+                return Winner.Unfinished;
+            }
+            return Winner.Draw;
         }
 
-        public void PlayGame()
+        bool AreSame(int a,int b,int c)
         {
-            Player playerX = new Player('x',"First");
-            Player playerO = new Player('o',"Second");
-            int counter = 0;
-
-            while (counter < 9)
-            {
-                Print();
-                if(counter % 2 == 0)
-                {
-                    if (playerX.MakeMove())
-                    {
-                        continue;
-                    }
-
-                    if (Combination())
-                    {
-                        Print();
-                        Console.WriteLine("First player win");
-                        break;
-                    }
-
-                    counter++;
-                }
-                else
-                {
-                    if (playerO.MakeMove())
-                    {
-                        continue;
-                    }
-
-                    if (Combination())
-                    {
-                        Print();
-                        Console.WriteLine("Second player win");
-                        break;
-                    }
-
-                    counter++;
-                }
-            }
-
-            if (!Combination() && counter == 9)
-            {
-                Console.WriteLine("Draw");
-            }
-
+            return GetState(a) == GetState(b) && GetState(b) == GetState(c);
         }
     }
 }
